@@ -27,11 +27,12 @@ class RiseClassifier:
             converts the dataframe to instance and the infer and extend the rules
         """
         df = self.__process_df(x_df.copy())
+        self.__categorical_probabilities(x_df,y_df)
         self.instances = self.__df_to_instances(df.to_numpy(),y_df.to_numpy().flatten())
         
         # induct the rules from instances  using leave-one-out
         self.rules = list(set([InstanceRule(inst) for inst in self.instances]))
-        final_precision = RiseUtils.rules_accuracy(self.instances,self.rules) 
+        final_precision = RiseUtils.rules_accuracy(self.instances,self.rules,self.stats_dict) 
         rules_prime = copy.copy(self.rules)
        
         print(f'intial len of rule {len(rules_prime)}')
@@ -44,14 +45,14 @@ class RiseClassifier:
                     break
             
                 # instance nearest to the rule not covered by the rule and being the same class
-                closest_instance = RiseUtils.closest_instance(rule,self.instances)
+                closest_instance = RiseUtils.closest_instance(rule,self.instances,self.stats_dict)
                 # most specific generalization
                 rule_prime = copy.copy(rule)
                 rule_prime.fit(closest_instance)
                 # update set with new rule
                 rules_prime[index] = rule_prime
                 
-                if RiseUtils.rules_accuracy(self.instances,rules_prime) >= RiseUtils.rules_accuracy(self.instances,self.rules):
+                if RiseUtils.rules_accuracy(self.instances,rules_prime,self.stats_dict) >= RiseUtils.rules_accuracy(self.instances,self.rules,self.stats_dict):
                     if rule_prime in self.rules:
                         rules_prime.pop(index)
                     self.rules = rules_prime
@@ -59,7 +60,7 @@ class RiseClassifier:
                 else:
                     rules_prime[index] = rule
         
-            final_precision = RiseUtils.rules_accuracy(self.instances,self.rules)
+            final_precision = RiseUtils.rules_accuracy(self.instances,self.rules,self.stats_dict)
             print(f'Iteration over rules is done initial precision: [{initial_precision}]  final precision:[{final_precision}]')
             if final_precision <= initial_precision:
                 break
@@ -75,7 +76,7 @@ class RiseClassifier:
         y_mock = [ None for i in range(len(x_df))]
         df  = self.__proces_df_predict(x_df)
         instances = self.__df_to_instances(df.to_numpy(),y_mock)
-        return [RiseUtils.closest_rule(instance,self.rules) for instance in instances]
+        return [RiseUtils.closest_rule(instance,self.rules,self.stats_dict) for instance in instances]
 
 
     def __df_to_instances(self,x_df:pd.DataFrame,y_df:pd.DataFrame)->List[Instance]:
@@ -131,3 +132,36 @@ class RiseClassifier:
             else:
                 df_copy[column] = transformer.transform(arr)
         return df_copy
+
+
+    def __categorical_probabilities(self,x_df:pd.DataFrame,y_df:pd.DataFrame):
+        """
+            compute probabilities for categorical attributes 
+        """
+        stats_dict = dict()
+
+        # for each column in categorical colums
+        for column in self.categorical_columns:
+            # build a dict of probabilies only for this column
+            column_stats = dict()
+            
+            # for each unique value in in the above column
+            for value_of_column in x_df[column].unique():
+                # build the probability dict of this specific value in the column
+                value_of_column_stats= dict()
+                #pick categories/labels which have x[current_column] ==  [current_value of column]
+                value_series = y_df[x_df[column] == value_of_column]
+                #count how many of this values do we have 
+                total_count = len(value_series)
+
+                # for each label/class/category compute how many of the are of the current value of the column
+                for current_label in y_df.iloc[:,0].unique():
+                    # get the fraction of value which have current_value_of_column with label y_class
+                    value_of_column_stats[current_label] =((value_series == current_label).astype(int).sum() / total_count)[0]
+                
+                # append to the column dict stats with current current_value_of_column 
+                column_stats[value_of_column] = value_of_column_stats
+            # append column dict to dict which contains all stats of categorical variables
+            stats_dict[column] = column_stats
+
+        self.stats_dict = stats_dict

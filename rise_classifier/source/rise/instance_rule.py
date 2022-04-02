@@ -1,6 +1,6 @@
 
 
-from .instance import Instance, CategoricalInstanceAttribute, NumericInstanceAttribute
+from .instance import Instance, CategoricalInstanceAttribute, NumericInstanceAttribute, GenericInstanceAttribute
 import numpy as np
 from dataclasses import dataclass
 from typing import List, Set, Tuple
@@ -64,6 +64,26 @@ class AtributeNumericalRule(GenericAttributeRule):
         return f'({self.attribute_name} in [{round(self.lower_bound,3)},{round(self.upper_bound,3)}])'
 
 
+    def distance(self,attribute:NumericInstanceAttribute):
+        """
+            normalized numeric range distance between attribute rule and actual attribute
+        """
+        input = attribute.value
+        # the distance is zero if the value is in the bounds' range
+        if self.lower_bound <= input and input <= self.upper_bound:
+            return 0
+
+        # otherwise, if the bounds are same, the distance is maximum
+        if self.lower_bound == self.upper_bound:
+            return 1
+
+        # otherwise, measure the distance to the surpassed bound, normalizing by the range length
+        if input > self.upper_bound:
+            return (input - self.upper_bound) / (self.upper_bound - self.lower_bound)
+        return (self.lower_bound - input) / (self.upper_bound - self.lower_bound)
+
+    
+
 @dataclass(unsafe_hash=True, eq=True)
 class AtributeCategoricalRule(GenericAttributeRule):
     """
@@ -84,6 +104,25 @@ class AtributeCategoricalRule(GenericAttributeRule):
     def __str__(self):
         return f'({self.attribute_name} == {self.value})'
 
+    def distance(self,attribute:CategoricalInstanceAttribute,prob_dist:dict)->float:
+        if self.value == attribute.value:
+            return 0 
+        
+        current_attr_stats = prob_dist[self.attribute_name].get(self.value,None)
+        input_attr_stats = prob_dist[attribute.attribute_name].get(attribute.value,None)
+        if not input_attr_stats or not current_attr_stats:
+            return 1
+        
+        dist = 0 
+
+        for y_class in current_attr_stats.keys():
+
+            category0_prob = current_attr_stats[y_class]
+            category1_prob = input_attr_stats[y_class]
+
+            dist += abs(category0_prob - category1_prob) ** 2
+
+        return dist
 
 @dataclass(unsafe_hash=True, eq=True)
 class InstanceRule:
@@ -172,7 +211,7 @@ class InstanceRule:
             self.numpy = np.array(ll)
         return self.numpy
 
-    def distance(self, instance: Instance) -> float:
+    def euclidean_distance(self, instance: Instance) -> float:
         """
             compute the distance between rule and instance
         """
@@ -194,3 +233,16 @@ class InstanceRule:
 
         self.coverage = round((coverage_counter / size)*100,3)
         self.precision = round((precision_counter / coverage_counter)*100,3)
+
+    def distance(self,instance:Instance,stats:dict)-> float:
+        """
+            compute the distance beween the instance and current rule 
+        """
+        distance = 0
+        for attribute in instance.properties:
+            rule = self.get_rule(attribute.attribute_name)
+            if isinstance(attribute,CategoricalInstanceAttribute):
+                distance += rule.distance(attribute,stats) ** 2
+            else:
+                distance += rule.distance(attribute) ** 2
+        return distance

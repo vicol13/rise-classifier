@@ -50,6 +50,7 @@ class Instance(object):
         self.properties = properties
         self.numpy = np.array([prop.value for prop in self.properties])
 
+
     @staticmethod
     def build(label: str, attributes_metadata: Tuple[str, Number, bool]) -> 'Instance':
         """
