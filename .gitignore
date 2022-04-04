@@ -50,3 +50,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+
+# tex 
+documents/report/out
