@@ -54,3 +54,4 @@ wheels/
 
 # tex 
 documents/report/out
+.vscode/
