@@ -1,6 +1,5 @@
 import pandas as pd
 import copy
-
 from .rise_utils import RiseUtils
 from data_utils import DataUtils
 from .instance import Instance
@@ -32,7 +31,7 @@ class RiseClassifier:
         
         # induct the rules from instances  using leave-one-out
         self.rules = list(set([InstanceRule(inst) for inst in self.instances]))
-        final_precision = RiseUtils.rules_accuracy(self.instances,self.rules,self.stats_dict) 
+        final_precision = RiseUtils.rules_precision(self.instances,self.rules,self.stats_dict) 
         rules_prime = copy.copy(self.rules)
        
         print(f'intial len of rule {len(rules_prime)}')
@@ -51,8 +50,8 @@ class RiseClassifier:
                 rule_prime.fit(closest_instance)
                 # update set with new rule
                 rules_prime[index] = rule_prime
-                
-                if RiseUtils.rules_accuracy(self.instances,rules_prime,self.stats_dict) >= RiseUtils.rules_accuracy(self.instances,self.rules,self.stats_dict):
+
+                if RiseUtils.rules_precision(self.instances,rules_prime,self.stats_dict) >= RiseUtils.rules_precision(self.instances,self.rules,self.stats_dict):
                     if rule_prime in self.rules:
                         rules_prime.pop(index)
                     self.rules = rules_prime
@@ -60,7 +59,7 @@ class RiseClassifier:
                 else:
                     rules_prime[index] = rule
         
-            final_precision = RiseUtils.rules_accuracy(self.instances,self.rules,self.stats_dict)
+            final_precision = RiseUtils.rules_precision(self.instances,self.rules,self.stats_dict)
             print(f'Iteration over rules is done initial precision: [{initial_precision}]  final precision:[{final_precision}]')
             if final_precision <= initial_precision:
                 break
@@ -94,7 +93,7 @@ class RiseClassifier:
         return instances 
 
 
-    def __process_df(self,df:pd.DataFrame):
+    def __process_df(self,df:pd.DataFrame)->pd.DataFrame:
         """
             apply ordinal enconding and normalization for df attributes
             also save the attribute encoding in self.categorical_econding

@@ -65,4 +65,4 @@ class Instance(object):
                 attr = NumericInstanceAttribute(attr_metadata[0], attr_metadata[1])
             llist.append(attr)
 
-        return Instance(label, llist)
+        return Instance(label, tuple(llist))

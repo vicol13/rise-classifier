@@ -14,7 +14,7 @@ class RiseUtils:
     """
     
     @staticmethod
-    def rules_accuracy(instances: List[Instance], rules: List[InstanceRule],stats_dict:dict)->float:
+    def rules_precision(instances: List[Instance], rules: List[InstanceRule],stats_dict:dict)->float:
         """
             calculate the accuracy of rules on the instances
         """
@@ -42,7 +42,7 @@ class RiseUtils:
     @staticmethod
     def closest_instance(rule: InstanceRule, instances: List[Instance],stats_dict:dict) -> Instance:
         """
-            return the closest_instance instance for rule
+            return the closest_instance with same label and which is covered by rule
         """
         # filter out instances which are not covered and have different label
         new_list = list(filter(lambda instance: not rule.is_covering(instance) and rule.label == instance.label, instances))

@@ -37,7 +37,7 @@ class GenericAttributeRule:
 
 
 @dataclass(unsafe_hash=True, eq=True)
-class AtributeNumericalRule(GenericAttributeRule):
+class AttributeNumericalRule(GenericAttributeRule):
     """
         rule for numerical attribute of an instance
     """
@@ -85,7 +85,7 @@ class AtributeNumericalRule(GenericAttributeRule):
     
 
 @dataclass(unsafe_hash=True, eq=True)
-class AtributeCategoricalRule(GenericAttributeRule):
+class AttributeCategoricalRule(GenericAttributeRule):
     """
         represent categorical rule for an atribute of an instance
     """
@@ -143,10 +143,10 @@ class InstanceRule:
         conclusions = []
         for attribute in instance.properties:
             if isinstance(attribute, CategoricalInstanceAttribute):
-                rule = AtributeCategoricalRule(attribute.attribute_name, attribute.value)
+                rule = AttributeCategoricalRule(attribute.attribute_name, attribute.value)
                 conclusions.append(rule)
             elif isinstance(attribute, NumericInstanceAttribute):
-                rule = AtributeNumericalRule(attribute.attribute_name, attribute.value, attribute.value)
+                rule = AttributeNumericalRule(attribute.attribute_name, attribute.value, attribute.value)
                 conclusions.append(rule)
         self.conclusions = tuple(conclusions)
         
@@ -159,6 +159,8 @@ class InstanceRule:
         # properties will be update the rule infering is done
         self.coverage = None
         self.precision = None
+
+        self.distances = {}
 
     def __str__(self):
         return f'class[{self.label}]  - coverage[{self.coverage}%] -  precision[{self.precision}%] >> {[str(subr) for subr in self.conclusions]}'
@@ -201,12 +203,12 @@ class InstanceRule:
         if is_update_call or self.numpy is None:
             ll = []
             for rule in self.conclusions:
-                if isinstance(rule, AtributeNumericalRule):
+                if isinstance(rule, AttributeNumericalRule):
                     # we get the middle between the lower bound and upper_bound
                     # when we have to calculate the distance
                     mid = (rule.lower_bound + rule.upper_bound)/2
                     ll.append(mid)
-                elif isinstance(rule, AtributeCategoricalRule):
+                elif isinstance(rule, AttributeCategoricalRule):
                     ll.append(rule.value)
             self.numpy = np.array(ll)
         return self.numpy
@@ -238,6 +240,12 @@ class InstanceRule:
         """
             compute the distance beween the instance and current rule 
         """
+        hash_val = hash(instance)
+        distance = self.distances.get(hash_val,None)
+
+        if distance is not None:
+            return distance
+
         distance = 0
         for attribute in instance.properties:
             rule = self.get_rule(attribute.attribute_name)
@@ -245,4 +253,5 @@ class InstanceRule:
                 distance += rule.distance(attribute,stats) ** 2
             else:
                 distance += rule.distance(attribute) ** 2
+        self.distances[hash_val] = distance
         return distance
