@@ -34,7 +34,7 @@ def print_metrics(y_true,y_predicted,title=""):
 
 
 if __name__ == "__main__":
-    start = time.time()
+    
     dataset = f'{sys.argv[1]}'
     path = f'{DATA_ROOT}{dataset}'
 
@@ -42,12 +42,12 @@ if __name__ == "__main__":
         print(f"dataset doesn't exist only avail datasetes [{glob.glob(f'{DATA_ROOT}*.csv')}]")
         exit
     
-    iterations = 2
+    iterations = 3
     df = pd.read_csv(path)
     x_train, y_train, x_test, y_test = DataUtils.split_into_folds(df,iterations)
     # scipy.special.seterr('ingore')
     for x_train,y_train,x_test,y_test in zip(x_train,y_train,x_test,y_test):
-      
+        start = time.time()
         rise_classifier = RiseClassifier(x_train.columns)
     
         rise_classifier.fit(x_train,y_train)
