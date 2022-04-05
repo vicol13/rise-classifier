@@ -19,7 +19,7 @@ class GenericInstanceAttribute(object):
 @dataclass(unsafe_hash=True, eq=True)
 class NumericInstanceAttribute(GenericInstanceAttribute):
     """
-        represent numerica attribute of instance
+        represent numerical attribute of instance
     """
     value: float
 
