@@ -2,6 +2,9 @@
 
 ## The RISE algorithm
 
+The repository represents the implementation of the RISE algorithm done 
+for Supervised Experiential Learning for UPC. 
+
 
 ```diff
 
@@ -39,3 +42,30 @@
  ┣ 📜PW1-SEL-2122.pdf
  ┗ 📜RISE-Domingos-Mahine Learning-24-141-168-1996.pdf
  ```
+
+
+# Set up the project
+1. create virtual environment
+```shell
+python3 -m venv venv/
+```
+2. enter virtual environment
+```shell
+source venv/bin/activate
+```
+3. install dependencies 
+```shell
+pip3 install requirements.txt
+```
+# Running the algorithm
+
+1. enter the virtual environment
+```shell
+source venv/bin/activate
+```
+
+2. run the algorithm
+```
+python3 rise_classifier/source/main.py <data_set_name>
+```
+make sure <data_set_name> is in folder rise_classifier/data

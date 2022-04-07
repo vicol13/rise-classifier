@@ -98,7 +98,7 @@ in order to increase the precision of rules-set, the process is continuous until
 \subsection{Structure}
 In Figure \ref{fig:class_structure} we can see the class structure of the classifier, algorithm was implemented mainly 
 using object-oriented programming \cite{rentsch1982object} style instead of keeping everything in array and there are few reasons for that. First
-reason is that is easier to read for humans which is the most important thing for program, second is that if we would keep everything
+reason is that is easier to read for humans, second is that if we would keep everything
 in the array it would be hard to maintain the code and to extend it and also with object-oriented programming we can improve the 
 performance of the code of the algorithm: 
 
@@ -426,6 +426,7 @@ which is a good result, but there is space for improvement.
             \caption{Metrics of the rise classifier on the test set}
             \label{table:cancer_test}
         \end{table}
+
 Bellow we can see the inferred rule from the dataset one major difference is coverage comparing to wine dataset, but this difference is more related to size of the dataset. 
 Also, we can see that second rule coverage is 6.87\% and has 100\% which is impressive if we compare with the last rules which 
 have about 0.2\% coverage.  \\
@@ -440,6 +441,112 @@ have about 0.2\% coverage.  \\
 }
 
 \subsection{Obesity}
+And the last data set is obesity data set, as we can see in Table \ref{table:obesity_train} and \ref{table:obesity_test} results 
+don't differ too much from the previous data sets, one major difference is that the metrics decreased in the test set to 76\& - 81\%
+which leave some space for improvement, but still is good results. In terms of execution time data set took high amount of time, which
+again lead us to previous idea that we have to improve the performance of algorithm. Also, we have to say that the data set has plenty of categorical and numerical
+attributes comparing with the previous 2 datasets, and also there are 7 categories for classification and in classification report 
+\path{out/obesity.txt} we can see that algorithm has good precision and recall for all classes.
+
+
+\begin{table}[h]
+    \footnotesize
+    \subcaptionbox{fold 1}{
+        \begin{tabular}[t]{|p{2.5cm}|c|}
+            \hline
+            \textbf{metric}& \textbf{value}\\ \hline
+            balanced accuracy & 99.29 \% \\ \hline
+            accuracy    &   99.29  \% \\ \hline
+            f1 score & 99.29 \% \\ \hline   
+            precision & 99.3 \% \\  \hline
+            recall & 99.29 \% \\ \hline   
+       
+        \end{tabular}}
+        \hfill
+        \subcaptionbox{fold 2}{
+        \begin{tabular}[t]{|p{2.5cm}|c|}
+            \hline
+            \textbf{metric}& \textbf{value}\\ \hline
+            balanced accuracy & 99.21\%\\ \hline
+            accuracy & 99.22\% \\ \hline
+            f1 score & 99.22\% \\ \hline
+            precision & 99.22\% \\ \hline   
+            recall & 99.22\% \\ \hline
+
+        
+
+        \end{tabular}}
+        \hfill
+        \subcaptionbox{fold 3}{
+            \begin{tabular}[t]{|p{2.5cm}|c|}
+                \hline
+                \textbf{metric}& \textbf{value}\\ \hline
+                balanced accuracy & 99.22\%\\ \hline
+                accuracy & 99.25\% \\ \hline
+                f1 score & 99.25\% \\ \hline
+                precision & 99.25\% \\ \hline   
+                recall & 99.22\% \\ \hline
+    
+            \end{tabular}}
+        \caption{Metrics of the rise classifier on the train set}
+        \label{table:obesity_train}
+    \end{table}
+
+    \begin{table}[h]
+        \footnotesize
+        \subcaptionbox{fold 1}{
+            \begin{tabular}[t]{|p{2.5cm}|c|}
+                \hline
+                \textbf{metric}& \textbf{value}\\ \hline
+                balanced accuracy & 81.42\%\\ \hline
+                accuracy & 81.68\% \\ \hline
+                f1 score & 82.04\% \\ \hline
+                precision & 84.19\% \\ \hline   
+                recall & 81.68\% \\ \hline
+    
+            \end{tabular}}
+            \hfill
+            \subcaptionbox{fold 2}{
+                \begin{tabular}[t]{|p{2.5cm}|c|}
+                    \hline
+                    \textbf{metric}& \textbf{value}\\ \hline
+                    balanced accuracy & 76.59\%\\ \hline
+                    accuracy & 76.85\% \\ \hline
+                    f1 score & 76.88\% \\ \hline
+                    precision & 78.06\% \\ \hline   
+                    recall & 76.85\% \\ \hline
+        
+                \end{tabular}}
+            \hfill
+            \subcaptionbox{fold 3}{
+                \begin{tabular}[t]{|p{2.5cm}|c|}
+                    \hline
+                    \textbf{metric}& \textbf{value}\\ \hline
+                    balanced accuracy & 78.32\%\\ \hline
+                    accuracy & 78.51\% \\ \hline
+                    f1 score & 79.03\% \\ \hline
+                    precision & 80.02\% \\ \hline   
+                    recall & 79.2\% \\ \hline
+        
+                \end{tabular}}
+            \caption{Metrics of the rise classifier on the test set}
+            \label{table:obesity_test}
+        \end{table}
+
+
+\newpage
+\mybox{
+    \begin{itemize}
+    % \item class{[a]}
+    \item class[Obesity\_Type\_II] -   coverage[0.142\%] -  precision[100.0\%] -- ['(Gender == 1.0)', '(Age in [0.256,0.376])', '(Height in [0.648,0.742])', '(Weight in [0.56,0.62])', '(family\_history\_with\_overweight == 1.0)', '(FAVC == 1.0)', '(FCVC in [0.5,0.597])', '(NCP in [0.667,0.667])', '(CAEC == 2.0)', '(SMOKE == 0.0)', '(CH2O in [0.492,0.545])', '(SCC == 0.0)', '(FAF in [0.264,0.454])', '(TUE in [0.0,0.429])', '(CALC == 2.0)', '(MTRANS == 3.0)']
+    \item class[Obesity\_Type\_II  - coverage[0.142\%] -  precision[100.0\%] -- ['(Gender == 1.0)', '(Age in [0.248,0.376])', '(Height in [0.626,0.742])', '(Weight in [0.551,0.62])', '(family\_history\_with\_overweight == 1.0)', '(FAVC == 1.0)', '(FCVC in [0.145,0.5])', '(NCP in [0.667,0.667])', '(CAEC == 2.0)', '(SMOKE == 0.0)', '(CH2O in [0.492,0.504])', '(SCC == 0.0)', '(FAF in [0.264,0.459])', '(TUE in [0.0,0.001])', '(CALC == 2.0)', '(MTRANS == 3.0)']  
+    \item ... ... 
+    \item class[Obesity\_Type\_III]  - coverage[0.071\%] -  precision[100.0\%] -- ['(Gender == 0.0)', '(Age in [0.268,0.268])', '(Height in [0.36,0.36])', '(Weight in [0.491,0.491])', '(family\_history\_with\_overweight == 1.0)', '(FAVC == 1.0)', '(FCVC in [1.0,1.0])', '(NCP in [0.667,0.667])', '(CAEC == 2.0)', '(SMOKE == 0.0)', '(CH2O in [0.778,0.778])', '(SCC == 0.0)', '(FAF in [0.006,0.006])', '(TUE in [0.291,0.291])', '(CALC == 2.0)', '(MTRANS == 3.0)']
+    \item class[Obesity\_Type\_III]  - coverage[0.071\%] -  precision[100.0\%] -- ['(Gender == 0.0)', '(Age in [0.268,0.268])', '(Height in [0.329,0.329])', '(Weight in [0.508,0.508])', '(family\_history\_with\_overweight == 1.0)', '(FAVC == 1.0)', '(FCVC in [1.0,1.0])', '(NCP in [0.667,0.667])', '(CAEC == 2.0)', '(SMOKE == 0.0)', '(CH2O in [0.839,0.839])', '(SCC == 0.0)', '(FAF in [0.0,0.0])', '(TUE in [0.254,0.254])', '(CALC == 2.0)', '(MTRANS == 3.0)']
+    \end{itemize}
+}
+
+
 
 \section{Conclusion}
 As part of this practical work we implemented the rise classification algorithm which represent a way of unifying the 
@@ -452,7 +559,7 @@ values of instance decreased the execution for wine set from 400 seconds to 12 s
 big datasets is high. For more in-depth investigation of the results we can check the output files in the \path{output} directory
 where can see complete image of output of the algorithm. 
 
-% \addbibresource{refs.bib}
+% \addbibresource{refs.b`ib}
 
 
 
