@@ -38,6 +38,7 @@ for Supervised Experiential Learning for UPC.
  ┃ ┣ 📂out                  # output of .tex compilier
  ┃ ┃ ┣ 📜 **
  ┃ ┣ 📜refs.bib
+ ┃ ┣ 📜valeriu_vicol_rise.pdf # report of the work
  ┃ ┗ 📜valeriu_vicol_rise.tex
  ┣ 📜PW1-SEL-2122.pdf
  ┗ 📜RISE-Domingos-Mahine Learning-24-141-168-1996.pdf
