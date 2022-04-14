@@ -26,7 +26,7 @@
 \usepackage{setspace}
 \usepackage{pdflscape}
 \usepackage{tabu}
-\usepackage{biblatex} %Imports biblatex package
+% \usepackage{biblatex} %Imports biblatex package
 \linespread{1.25}
 \usepackage[breakable, theorems, skins]{tcolorbox}
 
@@ -41,7 +41,7 @@
 
 \begin{document}
 % \bibliographystyle{plain}
-
+\bibliographystyle{plain}
 \DeclareRobustCommand{\mybox}[2][gray!20]{%
 \begin{tcolorbox}[   %% Adjust the following parameters at will.
         breakable,
@@ -218,12 +218,12 @@ and then save distance and hash of instance in the dict. This small extra step d
 \section{Datasets}
 For testing the algorithm were picked 3 different datasets with different size, algorithms have categorical and numerical attributes as for first dataset was picked wine
 because it is relatively small, and it has only numerical attributes, similar thing is with second choice as it also mainly contains the numerical attributes and one categorical.
-And the third dataset is seismic bumps which contains plenty of numerical attributes and categorical. 
+And the third dataset is obesity which contains plenty of numerical attributes and categorical. 
 
 \subsection{Data processing}
 As the preprocessing step were used only 2 steps, normalization of numerical attributes using MinMaxScaller and encoding categorical ones using OrdinalEncoder. We 
 don't have any missing attributes in datasets, so we don't have to add additional step of filling in missing attributes. Then using StratifiedKFold from sklearn
-library dataset was split in 3 folds, so we can train algorithm more than one time on the dataset so see how it is behaves.
+library \cite{pedregosa2011scikit} dataset was split in 3 folds, so we can train algorithm more than one time on the dataset so see how it is behaves.
 \subsection{Wine}
 In this section we analyze the results of the algorithm on wine dataset in the Table \ref{table:wine_train} we can see
 the results of algorithm on the train set, we can clearly see that algorithm has very good results as all the metrics
@@ -442,7 +442,7 @@ have about 0.2\% coverage.  \\
 
 \subsection{Obesity}
 And the last data set is obesity data set, as we can see in Table \ref{table:obesity_train} and \ref{table:obesity_test} results 
-don't differ too much from the previous data sets, one major difference is that the metrics decreased in the test set to 76\& - 81\%
+don't differ too much from the previous data sets, one major difference is that the metrics decreased in the test set to 76\% - 81\%
 which leave some space for improvement, but still is good results. In terms of execution time data set took high amount of time, which
 again lead us to previous idea that we have to improve the performance of algorithm. Also, we have to say that the data set has plenty of categorical and numerical
 attributes comparing with the previous 2 datasets, and also there are 7 categories for classification and in classification report 
@@ -535,11 +535,13 @@ attributes comparing with the previous 2 datasets, and also there are 7 categori
 
 
 \newpage
+Bellow we can see inferred rules of the classifier on the train set with the coverage and precision as we can see that coverage of the rules is very small 
+main reason of this is the size of the data set and variety of the classes in dataset. 
 \mybox{
     \begin{itemize}
     % \item class{[a]}
     \item class[Obesity\_Type\_II] -   coverage[0.142\%] -  precision[100.0\%] -- ['(Gender == 1.0)', '(Age in [0.256,0.376])', '(Height in [0.648,0.742])', '(Weight in [0.56,0.62])', '(family\_history\_with\_overweight == 1.0)', '(FAVC == 1.0)', '(FCVC in [0.5,0.597])', '(NCP in [0.667,0.667])', '(CAEC == 2.0)', '(SMOKE == 0.0)', '(CH2O in [0.492,0.545])', '(SCC == 0.0)', '(FAF in [0.264,0.454])', '(TUE in [0.0,0.429])', '(CALC == 2.0)', '(MTRANS == 3.0)']
-    \item class[Obesity\_Type\_II  - coverage[0.142\%] -  precision[100.0\%] -- ['(Gender == 1.0)', '(Age in [0.248,0.376])', '(Height in [0.626,0.742])', '(Weight in [0.551,0.62])', '(family\_history\_with\_overweight == 1.0)', '(FAVC == 1.0)', '(FCVC in [0.145,0.5])', '(NCP in [0.667,0.667])', '(CAEC == 2.0)', '(SMOKE == 0.0)', '(CH2O in [0.492,0.504])', '(SCC == 0.0)', '(FAF in [0.264,0.459])', '(TUE in [0.0,0.001])', '(CALC == 2.0)', '(MTRANS == 3.0)']  
+    \item class[Obesity\_Type\_II]  - coverage[0.142\%] -  precision[100.0\%] -- ['(Gender == 1.0)', '(Age in [0.248,0.376])', '(Height in [0.626,0.742])', '(Weight in [0.551,0.62])', '(family\_history\_with\_overweight == 1.0)', '(FAVC == 1.0)', '(FCVC in [0.145,0.5])', '(NCP in [0.667,0.667])', '(CAEC == 2.0)', '(SMOKE == 0.0)', '(CH2O in [0.492,0.504])', '(SCC == 0.0)', '(FAF in [0.264,0.459])', '(TUE in [0.0,0.001])', '(CALC == 2.0)', '(MTRANS == 3.0)']  
     \item ... ... 
     \item class[Obesity\_Type\_III]  - coverage[0.071\%] -  precision[100.0\%] -- ['(Gender == 0.0)', '(Age in [0.268,0.268])', '(Height in [0.36,0.36])', '(Weight in [0.491,0.491])', '(family\_history\_with\_overweight == 1.0)', '(FAVC == 1.0)', '(FCVC in [1.0,1.0])', '(NCP in [0.667,0.667])', '(CAEC == 2.0)', '(SMOKE == 0.0)', '(CH2O in [0.778,0.778])', '(SCC == 0.0)', '(FAF in [0.006,0.006])', '(TUE in [0.291,0.291])', '(CALC == 2.0)', '(MTRANS == 3.0)']
     \item class[Obesity\_Type\_III]  - coverage[0.071\%] -  precision[100.0\%] -- ['(Gender == 0.0)', '(Age in [0.268,0.268])', '(Height in [0.329,0.329])', '(Weight in [0.508,0.508])', '(family\_history\_with\_overweight == 1.0)', '(FAVC == 1.0)', '(FCVC in [1.0,1.0])', '(NCP in [0.667,0.667])', '(CAEC == 2.0)', '(SMOKE == 0.0)', '(CH2O in [0.839,0.839])', '(SCC == 0.0)', '(FAF in [0.0,0.0])', '(TUE in [0.254,0.254])', '(CALC == 2.0)', '(MTRANS == 3.0)']
@@ -557,9 +559,11 @@ avoid computing more than one time distance between rule and instance, this is t
 this is done when we want to extend a rule or get the precision of rule-set which is costly. Work around with hashing
 values of instance decreased the execution for wine set from 400 seconds to 12 seconds, but however the amount of time for
 big datasets is high. For more in-depth investigation of the results we can check the output files in the \path{output} directory
-where can see complete image of output of the algorithm. 
+where we can see complete image of output of the algorithm. 
+Instruction how to run algorithm are explained in the \path{./README.md} file.
 
-% \addbibresource{refs.b`ib}
+\newpage
+\bibliography{refs}
 
 
 
