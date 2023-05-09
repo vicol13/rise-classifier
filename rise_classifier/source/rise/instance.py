@@ -19,7 +19,7 @@ class GenericInstanceAttribute(object):
 @dataclass(unsafe_hash=True, eq=True)
 class NumericInstanceAttribute(GenericInstanceAttribute):
     """
-        represent numerica attribute of instance
+        represent numerical attribute of instance
     """
     value: float
 
@@ -50,6 +50,7 @@ class Instance(object):
         self.properties = properties
         self.numpy = np.array([prop.value for prop in self.properties])
 
+
     @staticmethod
     def build(label: str, attributes_metadata: Tuple[str, Number, bool]) -> 'Instance':
         """
@@ -64,4 +65,4 @@ class Instance(object):
                 attr = NumericInstanceAttribute(attr_metadata[0], attr_metadata[1])
             llist.append(attr)
 
-        return Instance(label, llist)
+        return Instance(label, tuple(llist))

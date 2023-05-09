@@ -37,7 +37,7 @@ class GenericAttributeRule:
 
 
 @dataclass(unsafe_hash=True, eq=True)
-class AtributeNumericalRule(GenericAttributeRule):
+class AttributeNumericalRule(GenericAttributeRule):
     """
         rule for numerical attribute of an instance
     """
@@ -63,9 +63,27 @@ class AtributeNumericalRule(GenericAttributeRule):
     def __str__(self):
         return f'({self.attribute_name} in [{round(self.lower_bound,3)},{round(self.upper_bound,3)}])'
 
+    def distance(self, attribute: NumericInstanceAttribute):
+        """
+            normalized numeric range distance between attribute rule and actual attribute
+        """
+        input = attribute.value
+        # the distance is zero if the value is in the bounds' range
+        if self.lower_bound <= input and input <= self.upper_bound:
+            return 0
+
+        # otherwise, if the bounds are same, the distance is maximum
+        if self.lower_bound == self.upper_bound:
+            return 1
+
+        # otherwise, measure the distance to the surpassed bound, normalizing by the range length
+        if input > self.upper_bound:
+            return (input - self.upper_bound) / (self.upper_bound - self.lower_bound)
+        return (self.lower_bound - input) / (self.upper_bound - self.lower_bound)
+
 
 @dataclass(unsafe_hash=True, eq=True)
-class AtributeCategoricalRule(GenericAttributeRule):
+class AttributeCategoricalRule(GenericAttributeRule):
     """
         represent categorical rule for an atribute of an instance
     """
@@ -83,6 +101,29 @@ class AtributeCategoricalRule(GenericAttributeRule):
 
     def __str__(self):
         return f'({self.attribute_name} == {self.value})'
+
+    def distance(self, attribute: CategoricalInstanceAttribute, prob_dist: dict) -> float:
+        """
+            compute svdm distance to numerical attribute
+        """
+        if self.value == attribute.value:
+            return 0
+        
+        # check if we have the attributes in prob dict
+        current_attr_stats = prob_dist[self.attribute_name].get(self.value, None)
+        input_attr_stats = prob_dist[attribute.attribute_name].get(attribute.value, None)
+        
+        if not input_attr_stats or not current_attr_stats:
+            return 1
+
+        dist = 0
+
+        for y_class in current_attr_stats.keys():
+            p1 = current_attr_stats[y_class]
+            p2 = input_attr_stats[y_class]
+
+            dist += abs(p1 - p2) ** 2
+        return dist
 
 
 @dataclass(unsafe_hash=True, eq=True)
@@ -104,15 +145,15 @@ class InstanceRule:
         conclusions = []
         for attribute in instance.properties:
             if isinstance(attribute, CategoricalInstanceAttribute):
-                rule = AtributeCategoricalRule(attribute.attribute_name, attribute.value)
+                rule = AttributeCategoricalRule(attribute.attribute_name, attribute.value)
                 conclusions.append(rule)
             elif isinstance(attribute, NumericInstanceAttribute):
-                rule = AtributeNumericalRule(attribute.attribute_name, attribute.value, attribute.value)
+                rule = AttributeNumericalRule(attribute.attribute_name, attribute.value, attribute.value)
                 conclusions.append(rule)
         self.conclusions = tuple(conclusions)
-        
+
         # set it as None as we have "cache" this property
-        # and we check when it is none see to_numpy() 
+        # and we check when it is none see to_numpy()
         self.numpy = None
         self.numpy = self.to_numpy()
 
@@ -120,6 +161,8 @@ class InstanceRule:
         # properties will be update the rule infering is done
         self.coverage = None
         self.precision = None
+
+        self.__distances = {}
 
     def __str__(self):
         return f'class[{self.label}]  - coverage[{self.coverage}%] -  precision[{self.precision}%] >> {[str(subr) for subr in self.conclusions]}'
@@ -162,17 +205,17 @@ class InstanceRule:
         if is_update_call or self.numpy is None:
             ll = []
             for rule in self.conclusions:
-                if isinstance(rule, AtributeNumericalRule):
+                if isinstance(rule, AttributeNumericalRule):
                     # we get the middle between the lower bound and upper_bound
                     # when we have to calculate the distance
                     mid = (rule.lower_bound + rule.upper_bound)/2
                     ll.append(mid)
-                elif isinstance(rule, AtributeCategoricalRule):
+                elif isinstance(rule, AttributeCategoricalRule):
                     ll.append(rule.value)
             self.numpy = np.array(ll)
         return self.numpy
 
-    def distance(self, instance: Instance) -> float:
+    def euclidean_distance(self, instance: Instance) -> float:
         """
             compute the distance between rule and instance
         """
@@ -186,11 +229,34 @@ class InstanceRule:
         size = len(instances)
         coverage_counter, precision_counter = 0, 0
         for instance in instances:
-            
-            if self.is_covering(instance):
-                coverage_counter +=1 
-                if self.label == instance.label:
-                    precision_counter +=1
 
-        self.coverage = round((coverage_counter / size)*100,3)
-        self.precision = round((precision_counter / coverage_counter)*100,3)
+            if self.is_covering(instance):
+                coverage_counter += 1
+                if self.label == instance.label:
+                    precision_counter += 1
+
+        self.coverage = round((coverage_counter / size)*100, 3)
+        self.precision = round((precision_counter / coverage_counter)*100, 3)
+
+    def distance(self, instance: Instance, stats: dict) -> float:
+        """
+            tries to get the distance to instance from internal dict 
+            if they are not in the dict compute them
+
+            step with dict was added for better performance
+        """
+        hash_val = hash(instance)
+        distance = self.__distances.get(hash_val, None)
+
+        if distance is not None:
+            return distance
+
+        distance = 0
+        for attribute in instance.properties:
+            rule = self.get_rule(attribute.attribute_name)
+            if isinstance(attribute, CategoricalInstanceAttribute):
+                distance += rule.distance(attribute, stats) ** 2
+            else:
+                distance += rule.distance(attribute) ** 2
+        self.__distances[hash_val] = distance
+        return distance
